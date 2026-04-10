@@ -1,4 +1,7 @@
 package com.order.orders.exception;
 
-public class OrderNotFoundException {
+public class OrderNotFoundException extends RuntimeException {
+    public OrderNotFoundException(String message) {
+        super(message);
+    }
 }
