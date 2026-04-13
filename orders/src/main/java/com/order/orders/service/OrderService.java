@@ -1,7 +1,9 @@
 package com.order.orders.service;
 
+import com.order.orders.dto.OrderDto;
 import com.order.orders.entity.Order;
 import com.order.orders.exception.OrderNotFoundException;
+import com.order.orders.kafka.OrderProducer;
 import com.order.orders.repository.OrderRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,14 +13,26 @@ import java.util.List;
 @Service
 public class OrderService {
     private final OrderRepo orderRepo;
+    private final OrderProducer orderProducer;
 
     @Autowired
-    public OrderService(OrderRepo orderRepo) {
+    public OrderService(OrderRepo orderRepo, OrderProducer orderProducer) {
         this.orderRepo = orderRepo;
+        this.orderProducer = orderProducer;
     }
 
     public Order createOrder(Order order) {
-        return orderRepo.save(order);
+        //return orderRepo.save(order);
+        Order savedOrder = orderRepo.save(order);
+
+        OrderDto dto = new OrderDto();
+        dto.setOrderId(savedOrder.getOrderId());
+        dto.setTotal(savedOrder.getTotal());
+        dto.setStatus((savedOrder.getStatus()));
+
+        orderProducer.sendOrder(dto);
+
+        return savedOrder;
     }
 
     public Order updateOrder(Order order) {
