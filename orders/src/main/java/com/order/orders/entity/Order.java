@@ -1,10 +1,7 @@
 package com.order.orders.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -13,15 +10,16 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Table(name = "ORDERS")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
+    private Long id;
 
 //    @Column(name = "user_id")
 //    private Long userId;
-    @Column(name = "total_amt")
+    @Column(name = "total_amt", nullable = false)
     private BigDecimal total;
     @Column(name = "order_status")
     private String status;

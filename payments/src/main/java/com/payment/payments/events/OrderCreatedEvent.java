@@ -1,4 +1,4 @@
-package com.payment.payments.dto;
+package com.payment.payments.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,14 +7,14 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class PaymentDto {
+public class OrderCreatedEvent {
 
     private Long orderId;
-    private BigDecimal amount;
-    private String currency;
+    private Long userId;
+    private BigDecimal total;
 
 }

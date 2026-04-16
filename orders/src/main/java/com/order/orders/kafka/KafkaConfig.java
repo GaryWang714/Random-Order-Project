@@ -1,6 +1,6 @@
 package com.order.orders.kafka;
 
-import com.order.orders.dto.OrderDto;
+import com.order.orders.events.OrderCreatedEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class KafkaConfig {
 
     @Bean
-    public ProducerFactory<String, OrderDto> producerFactory() {
+    public ProducerFactory<String, OrderCreatedEvent> producerFactory() {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -28,7 +28,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, OrderDto> kafkaTemplate() {
+    public KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 

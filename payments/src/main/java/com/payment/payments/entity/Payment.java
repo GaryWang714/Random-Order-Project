@@ -1,29 +1,28 @@
 package com.payment.payments.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.payment.payments.enums.StatusEnum;
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 
-@Entity
+@Document(collection = "payments")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Payment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paymentId;
+    private String paymentId;
 
+    @Indexed(unique = true)
     private Long orderId;
 
     private String currency;
     private BigDecimal amount;
-    private String status;
+
+    private StatusEnum status;
 }

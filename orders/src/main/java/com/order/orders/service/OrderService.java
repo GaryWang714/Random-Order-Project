@@ -2,6 +2,7 @@ package com.order.orders.service;
 
 import com.order.orders.dto.OrderDto;
 import com.order.orders.entity.Order;
+import com.order.orders.events.OrderCreatedEvent;
 import com.order.orders.exception.OrderNotFoundException;
 import com.order.orders.kafka.OrderProducer;
 import com.order.orders.repository.OrderRepo;
@@ -25,12 +26,12 @@ public class OrderService {
         //return orderRepo.save(order);
         Order savedOrder = orderRepo.save(order);
 
-        OrderDto dto = new OrderDto();
-        dto.setOrderId(savedOrder.getOrderId());
-        dto.setTotal(savedOrder.getTotal());
-        dto.setStatus((savedOrder.getStatus()));
+        OrderCreatedEvent event = new OrderCreatedEvent();
+        event.setOrderId(savedOrder.getId());
+        //event.setUserId(savedOrder.getUserId());
+        event.setTotal(savedOrder.getTotal());
 
-        orderProducer.sendOrder(dto);
+        orderProducer.sendOrder(event);
 
         return savedOrder;
     }
@@ -40,7 +41,7 @@ public class OrderService {
     }
 
     public Order findByOrderId(Long orderId) {
-        return orderRepo.findByOrderId(orderId)
+        return orderRepo.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("order was not found with id: " + orderId));
     }
 
