@@ -47,8 +47,12 @@
   <div style="margin-bottom: 24px; padding: 16px; border: 1px solid #ddd; border-radius: 8px;">
     <h2>Create Order</h2>
     <label>Total: </label>
-    <input type="number" [(ngModel)]="newOrder.total" name="total" style="margin-right: 12px;" />
+    <input type="number" [(ngModel)]="newOrder.total" name="total"
+           min="0.01" max="10000" step="0.01" style="margin-right: 12px;" />
     <button (click)="createOrder()">Submit</button>
+    @if (errorMessage) {
+      <p style="color: red; margin-top: 8px;">{{ errorMessage }}</p>
+    }
   </div>
 
   <table style="width: 100%; border-collapse: collapse;">

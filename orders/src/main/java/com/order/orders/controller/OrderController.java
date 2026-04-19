@@ -1,7 +1,9 @@
 package com.order.orders.controller;
 
+import com.order.orders.dto.OrderRequest;
 import com.order.orders.entity.Order;
 import com.order.orders.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +34,8 @@ public class OrderController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Order> addOrder(@RequestBody Order order) {
-        Order newOrder = orderService.createOrder(order);
+    public ResponseEntity<Order> addOrder(@Valid @RequestBody OrderRequest request) {
+        Order newOrder = orderService.createOrder(request);
         return new ResponseEntity<>(newOrder, HttpStatus.CREATED);
     }
 

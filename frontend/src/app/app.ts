@@ -69,6 +69,7 @@ export class App implements OnInit {
 
   orders: Order[] = [];
   newOrder: Order = { total: 0, status: 'PENDING' };
+  errorMessage: string = '';
 
   constructor(private orderService: OrderService) {}
 
@@ -84,7 +85,11 @@ export class App implements OnInit {
 
   createOrder(): void {
     const total = Number(this.newOrder.total);
-    if (total <= 0) return;
+//     if (total <= 0) return;
+    if(total <= 0) {
+      this.errorMessage = 'Total must be greater than zero';
+      return;
+    }
 
     const clientId = crypto.randomUUID();
 
@@ -97,9 +102,21 @@ export class App implements OnInit {
     this.orderService.createOrder(payload).subscribe({
       next: (created) => {
         this.orders = this.orders.map(o => o.clientId === clientId ? { ...created, clientId } : o);
+        this.errorMessage = '';
       },
-      error: () => {
+//       error: () => {
+//         this.orders = this.orders.filter(o => o.clientId !== clientId);
+//       }
+      error: (err) => {
         this.orders = this.orders.filter(o => o.clientId !== clientId);
+        if(err.error && typeof err.error === 'object') {
+          this.errorMessage = Object.values(err.error).join(',');
+        }
+        else {
+          this.errorMessage = 'Something went wrong. Please try again.';
+        }
+//         const errors = err.error;
+//         this.errorMessage = Object.values(errors).join(', ');
       }
     });
   }

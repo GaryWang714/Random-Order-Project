@@ -1,6 +1,7 @@
 package com.order.orders.service;
 
 import com.order.orders.dto.OrderDto;
+import com.order.orders.dto.OrderRequest;
 import com.order.orders.entity.Order;
 import com.order.orders.events.OrderCreatedEvent;
 import com.order.orders.exception.OrderNotFoundException;
@@ -22,13 +23,22 @@ public class OrderService {
         this.orderProducer = orderProducer;
     }
 
-    public Order createOrder(Order order) {
+    public Order createOrder(OrderRequest request) {
         //return orderRepo.save(order);
+//        Order savedOrder = orderRepo.save(order);
+//
+//        OrderCreatedEvent event = new OrderCreatedEvent();
+//        event.setOrderId(savedOrder.getId());
+//        //event.setUserId(savedOrder.getUserId());
+//        event.setTotal(savedOrder.getTotal());
+        Order order = new Order();
+        order.setTotal(request.getTotal());
+        order.setStatus(request.getStatus());
+
         Order savedOrder = orderRepo.save(order);
 
         OrderCreatedEvent event = new OrderCreatedEvent();
         event.setOrderId(savedOrder.getId());
-        //event.setUserId(savedOrder.getUserId());
         event.setTotal(savedOrder.getTotal());
 
         orderProducer.sendOrder(event);
