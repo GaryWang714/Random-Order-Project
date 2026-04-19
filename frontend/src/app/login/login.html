@@ -1,0 +1,25 @@
+<div style="max-width: 400px; margin: 100px auto; font-family: sans-serif; padding: 24px; border: 1px solid #ddd; border-radius: 8px;">
+
+    <h2>Login</h2>
+
+    <div style="margin-bottom: 12px;">
+      <label>Username</label><br/>
+      <input type="text" [(ngModel)]="username" style="width:100%; padding: 8px; margin-top: 4px;" />
+    </div>
+
+    <div style="margin-bottom: 12px">
+      <label>Password</label><br/>
+      <input type="password" [(ngModel)]="password" style="width: 100%; padding: 8px; margin-top: 4px;" />
+    </div>
+
+    @if (errorMessage) {
+        <p style="color:red;">{{ errorMessage }}</p>
+    }
+
+    <button (click)="login()" style="width: 100%; padding: 10px;">Login</button>
+
+    <p style="text-align: center; margin-top: 12px;">
+      Don't have an account? <a href="/register">Register</a>
+    </p>
+
+</div>
