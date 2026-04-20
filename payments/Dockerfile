@@ -1,5 +1,5 @@
 # Build - Step 1
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM --platform=linux/amd64 maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline

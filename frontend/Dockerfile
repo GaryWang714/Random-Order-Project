@@ -1,6 +1,6 @@
 
 # Build - Step 1
-FROM node:22-alpine AS build
+FROM --platform=linux/amd64 node:22-alpine AS build
 WORKDIR /app
 COPY package.json ./
 RUN npm install
