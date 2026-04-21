@@ -1,126 +1,40 @@
-resource "aws_api_gateway_rest_api" "main" {
-  name        = "${var.project_name}-api"
-  description = "API Gateway for Random Order Project"
+resource "aws_apigatewayv2_api" "main" {
+  name          = "${var.project_name}-api"
+  protocol_type = "HTTP"
+
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers = ["Content-Type", "Authorization"]
+    max_age       = 300
+  }
 
   tags = {
     Name = "${var.project_name}-api"
   }
 }
 
-resource "aws_api_gateway_resource" "proxy" {
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  parent_id   = aws_api_gateway_rest_api.main.root_resource_id
-  path_part   = "{proxy+}"
+resource "aws_apigatewayv2_integration" "orders" {
+  api_id             = aws_apigatewayv2_api.main.id
+  integration_type   = "HTTP_PROXY"
+  integration_method = "ANY"
+  integration_uri    = "http://${aws_lb.main.dns_name}:8080/{proxy}"
+
+  payload_format_version = "1.0"
 }
 
-resource "aws_api_gateway_method" "proxy" {
-  rest_api_id   = aws_api_gateway_rest_api.main.id
-  resource_id   = aws_api_gateway_resource.proxy.id
-  http_method   = "ANY"
-  authorization = "NONE"
+resource "aws_apigatewayv2_route" "orders" {
+  api_id    = aws_apigatewayv2_api.main.id
+  route_key = "ANY /{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.orders.id}"
 }
 
-resource "aws_api_gateway_integration" "proxy" {
-  rest_api_id             = aws_api_gateway_rest_api.main.id
-  resource_id             = aws_api_gateway_resource.proxy.id
-  http_method             = aws_api_gateway_method.proxy.http_method
-  type                    = "HTTP_PROXY"
-  integration_http_method = "ANY"
-  uri                     = "http://${aws_lb.main.dns_name}:8080/{proxy}"
-}
+resource "aws_apigatewayv2_stage" "main" {
+  api_id      = aws_apigatewayv2_api.main.id
+  name        = "prod"
+  auto_deploy = true
 
-resource "aws_api_gateway_method" "root" {
-  rest_api_id   = aws_api_gateway_rest_api.main.id
-  resource_id   = aws_api_gateway_rest_api.main.root_resource_id
-  http_method   = "ANY"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "root" {
-  rest_api_id             = aws_api_gateway_rest_api.main.id
-  resource_id             = aws_api_gateway_rest_api.main.root_resource_id
-  http_method             = aws_api_gateway_method.root.http_method
-  type                    = "HTTP_PROXY"
-  integration_http_method = "ANY"
-  uri                     = "http://${aws_lb.main.dns_name}:8080"
-}
-
-resource "aws_api_gateway_deployment" "main" {
-  rest_api_id = aws_api_gateway_rest_api.main.id
-
-  triggers = {
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_integration.proxy,
-      aws_api_gateway_integration.root,
-      aws_api_gateway_integration.options,
-      aws_api_gateway_method.options,
-      aws_api_gateway_method_response.options,
-      aws_api_gateway_integration_response.options
-    ]))
-  }
-
-  depends_on = [
-    aws_api_gateway_integration.proxy,
-    aws_api_gateway_integration.root,
-    aws_api_gateway_integration.options,
-    aws_api_gateway_integration_response.options
-  ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_api_gateway_stage" "main" {
-  deployment_id = aws_api_gateway_deployment.main.id
-  rest_api_id   = aws_api_gateway_rest_api.main.id
-  stage_name    = "prod"
-}
-
-resource "aws_api_gateway_method" "options" {
-  rest_api_id   = aws_api_gateway_rest_api.main.id
-  resource_id   = aws_api_gateway_resource.proxy.id
-  http_method   = "OPTIONS"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "options" {
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.proxy.id
-  http_method = aws_api_gateway_method.options.http_method
-  type        = "MOCK"
-
-  request_templates = {
-    "application/json" = "{\"statusCode\": 200}"
-  }
-}
-
-resource "aws_api_gateway_method_response" "options" {
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.proxy.id
-  http_method = aws_api_gateway_method.options.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = true
-    "method.response.header.Access-Control-Allow-Methods" = true
-    "method.response.header.Access-Control-Allow-Origin"  = true
-  }
-}
-
-resource "aws_api_gateway_integration_response" "options" {
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.proxy.id
-  http_method = aws_api_gateway_method.options.http_method
-  status_code = "200"
-
-  depends_on = [
-    aws_api_gateway_integration.options
-  ]
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  tags = {
+    Name = "${var.project_name}-api-stage"
   }
 }

@@ -30,5 +30,10 @@ output "alb_dns_name" {
 
 output "api_gateway_url" {
   description = "API Gateway URL"
-  value       = aws_api_gateway_stage.main.invoke_url
+  value       = aws_apigatewayv2_stage.main.invoke_url
+}
+
+output "jenkins_url" {
+  description = "Jenkins UI URL"
+  value = "http://${aws_instance.jenkins.public_ip}:8080"
 }

@@ -53,5 +53,7 @@ services:
     container_name: frontend
     ports:
       - "80:80"
+    volumes:
+      - ./frontend/env.local.js:/usr/share/nginx/html/env.js:ro
     depends_on:
       - orders
