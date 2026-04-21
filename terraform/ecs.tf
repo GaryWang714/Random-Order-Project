@@ -94,6 +94,14 @@ resource "aws_ecs_task_definition" "orders" {
         {
           name = "SPRING_DATASOURCE_PASSWORD"
           value = var.db_password
+        },
+        {
+          name  = "SPRING_DATASOURCE_DRIVER_CLASS_NAME"
+          value = "org.postgresql.Driver"
+        },
+        {
+          name  = "SPRING_JPA_DATABASE_PLATFORM"
+          value = "org.hibernate.dialect.PostgreSQLDialect"
         }
       ]
       logConfiguration = {
@@ -186,11 +194,18 @@ resource "aws_ecs_service" "orders" {
   task_definition = aws_ecs_task_definition.orders.arn
   desired_count = 1
   launch_type = "FARGATE"
+  health_check_grace_period_seconds = 150
 
   network_configuration {
     subnets = [aws_subnet.public_1.id, aws_subnet.public_2.id]
     security_groups = [aws_security_group.ecs.id]
     assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.orders.arn
+    container_name = "orders"
+    container_port = 8080
   }
 }
 
@@ -219,6 +234,12 @@ resource "aws_ecs_service" "frontend" {
     subnets          = [aws_subnet.public_1.id, aws_subnet.public_2.id]
     security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.frontend.arn
+    container_name = "frontend"
+    container_port = 80
   }
 }
 

@@ -15,7 +15,8 @@ export interface AuthResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:8080/auth';
+  private apiUrl = `${(window as any).__env?.apiUrl || 'http://localhost:8080'}/auth`;
+  //private apiUrl = 'http://localhost:8080/auth';
 
   constructor(private http: HttpClient) {}
 

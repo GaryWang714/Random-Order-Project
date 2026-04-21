@@ -15,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -24,10 +27,12 @@ public class SecurityConfig {
     // config defines where the jwt filter sits in request chain
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+    private final CorsConfigurationSource corsConfigurationSource;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, UserDetailsService userDetailsService, CorsConfigurationSource corsConfigurationSource) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
+        this.corsConfigurationSource = corsConfigurationSource;
     }
 
     @Bean
@@ -36,13 +41,17 @@ public class SecurityConfig {
         // disabled since using jwt tokens
 
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // request matchers below allowing /auth/** which is login and register endpoints to be public
                         // ^ /swagger-ui/** and /v3/api-docs/** makes swagger public for devs to read docs
                         // then anything else requires jwt token
-                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .anyRequest().authenticated()
+//                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+//                        .anyRequest().authenticated()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health").permitAll()
+                                .anyRequest().authenticated()
                 )
                 // tells spring to not create sessions. spring normally remembers who you are with session cookie
                 // with jwt we don't need this since token carries identity on every request

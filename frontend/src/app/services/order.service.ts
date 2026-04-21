@@ -13,7 +13,8 @@ export interface Order {
   providedIn: 'root',
 })
 export class OrderService {
-  private apiUrl = 'http://localhost:8080/order';
+  private apiUrl = `${(window as any).__env?.apiUrl || 'http://localhost:8080'}/order`;
+  //private apiUrl = 'http://localhost:8080/order';
 
   constructor(private http: HttpClient) {}
 

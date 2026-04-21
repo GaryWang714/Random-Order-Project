@@ -29,7 +29,7 @@ export class OrdersComponent implements OnInit {
 
   loadOrders(): void {
     this.orderService.getOrders().subscribe(data =>
-      this.orders = data.map(o => ({ ...o, clientId: crypto.randomUUID() }))
+      this.orders = data.map(o => ({ ...o, clientId: this.generateId() }))
     );
   }
 
@@ -40,7 +40,7 @@ export class OrdersComponent implements OnInit {
       return;
     }
 
-    const clientId = crypto.randomUUID();
+    const clientId = this.generateId();
     const payload: Order = { ...this.newOrder, total };
     const temp: Order = { clientId, ...payload };
 
@@ -77,5 +77,9 @@ export class OrdersComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  private generateId(): string {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
   }
 }
