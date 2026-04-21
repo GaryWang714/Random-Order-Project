@@ -41,7 +41,11 @@ public class OrderService {
         event.setOrderId(savedOrder.getId());
         event.setTotal(savedOrder.getTotal());
 
-        orderProducer.sendOrder(event);
+        try {
+            orderProducer.sendOrder(event);
+        } catch (Exception e) {
+            System.out.println("[OrderService] Kafka unavailable, skipping event publish: " + e.getMessage());
+        }
 
         return savedOrder;
     }
