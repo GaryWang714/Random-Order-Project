@@ -125,18 +125,26 @@ resource "aws_iam_instance_profile" "jenkins" {
 
 resource "aws_instance" "jenkins" {
   ami                    = data.aws_ami.amazon_linux_2023.id
-  instance_type          = "t3.micro"
+  instance_type          = "t3.small"
   subnet_id              = aws_subnet.public_1.id
   vpc_security_group_ids = [aws_security_group.jenkins.id]
   iam_instance_profile   = aws_iam_instance_profile.jenkins.name
 
   user_data = <<-EOF
     #!/bin/bash
-    dnf install -y java-17-amazon-corretto unzip
+    dnf install -y java-21-amazon-corretto unzip git
 
-    curl -o /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    curl -L -o /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
     rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
     dnf install -y jenkins
+
+    mkdir -p /etc/systemd/system/jenkins.service.d
+    cat > /etc/systemd/system/jenkins.service.d/override.conf <<OVERRIDE
+    [Service]
+    Environment="JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto"
+    OVERRIDE
+
+    systemctl daemon-reload
     systemctl enable jenkins
     systemctl start jenkins
 
@@ -149,7 +157,6 @@ resource "aws_instance" "jenkins" {
     unzip awscliv2.zip
     ./aws/install
 
-    dnf install -y git
     systemctl restart jenkins
   EOF
 
