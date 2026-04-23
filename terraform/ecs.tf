@@ -81,7 +81,7 @@ resource "aws_ecs_task_definition" "orders" {
       environment = [
         {
           name = "SPRING_KAFKA_BOOTSTRAP_SERVERS"
-          value = "kafka:29092"
+          value = "kafka.random-order.local:9092"
         },
         {
           name = "SPRING_DATASOURCE_URL"
@@ -102,7 +102,7 @@ resource "aws_ecs_task_definition" "orders" {
         {
           name  = "SPRING_JPA_DATABASE_PLATFORM"
           value = "org.hibernate.dialect.PostgreSQLDialect"
-        }
+        },
       ]
       logConfiguration = {
         logDriver = "awslogs"
@@ -138,11 +138,11 @@ resource "aws_ecs_task_definition" "payments" {
       environment = [
         {
           name = "SPRING_KAFKA_BOOTSTRAP_SERVERS"
-          value = "kafka:29092"
+          value = "kafka.random-order.local:9092"
         },
         {
           name = "SPRING_DATA_MONGODB_URI"
-          value = "mongodb://mongodb:27017/payments"
+          value = "mongodb+srv://root:rootpassword@cluster0.oie64di.mongodb.net/payments?appName=Cluster0"
         }
       ]
       logConfiguration = {
