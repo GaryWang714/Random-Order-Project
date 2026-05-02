@@ -73,6 +73,11 @@ resource "aws_cloudwatch_log_group" "frontend" {
   retention_in_days = 7
 }
 
+# =============================================
+# ECS TASK DEFINITIONS AND SERVICES - COMMENTED OUT FOR EKS MIGRATION
+# =============================================
+
+/*
 resource "aws_ecs_task_definition" "orders" {
   family = "${var.project_name}-orders"
   network_mode = "awsvpc"
@@ -262,3 +267,4 @@ resource "aws_ecs_service" "frontend" {
 # CloudWatch Log Groups — where your container logs will be stored (we'll use these in the CloudWatch monitoring step)
 # Task Definitions — blueprints for your containers. Defines the Docker image, CPU/memory, environment variables, and where to send logs
 # ECS Services — keeps your tasks running. If a container crashes, the service restarts it automatically. desired_count = 1 means always keep one instance running
+*/
