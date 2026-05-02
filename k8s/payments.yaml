@@ -14,15 +14,17 @@ spec:
     spec:
       containers:
         - name: payments
-          image: random-order-payments:local
-          imagePullPolicy: Never
+#          image: random-order-payments:local
+          image: ${PAYMENTS_IMAGE}
+#          imagePullPolicy: Never
           ports:
             - containerPort: 8081
           env:
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: "kafka:9092"
             - name: SPRING_DATA_MONGODB_URI
-              value: "mongodb://root:rootpassword@mongodb:27017/payments?authSource=admin"
+#              value: "mongodb://root:rootpassword@mongodb:27017/payments?authSource=admin"
+              value: "mongodb+srv://root:rootpassword@cluster0.oie64di.mongodb.net/payments?appName=Cluster0"
 ---
 apiVersion: v1
 kind: Service

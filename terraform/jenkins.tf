@@ -175,6 +175,13 @@ resource "aws_instance" "jenkins" {
     systemctl restart jenkins
   EOF
 
+  key_name = "jenkins-key"
+
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
+
   tags = {
     Name = "${var.project_name}-jenkins"
   }

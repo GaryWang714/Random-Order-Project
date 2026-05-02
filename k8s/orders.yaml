@@ -14,15 +14,17 @@ spec:
     spec:
       containers:
         - name: orders
-          image: random-order-orders:local
-          imagePullPolicy: Never
+#          image: random-order-orders:local
+          image: ${ORDERS_IMAGE}
+#          imagePullPolicy: Never
           ports:
             - containerPort: 8080
           env:
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: "kafka:9092"
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:postgresql://postgres:5432/orders"
+#              value: "jdbc:postgresql://postgres:5432/orders"
+              value: "jdbc:postgresql://${RDS_ENDPOINT}/orders"
             - name: SPRING_DATASOURCE_USERNAME
               value: "postgres"
             - name: SPRING_DATASOURCE_PASSWORD
